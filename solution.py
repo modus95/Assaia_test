@@ -4,14 +4,14 @@ def printfield(field):
     '''Prints game's field'''
 
     rows = ['a','b','c','d','e','f']
-    bottom_line = '    1   2   3   4   5   6   7   '
+    bottom_line = '  1   2   3   4   5   6   7   '
     row = [[n] for n in range(0,7)]
-    row[0][0] = 'f | '
-    row[1][0] = 'e | '
-    row[2][0] = 'd | '
-    row[3][0] = 'c | '
-    row[4][0] = 'b | '
-    row[5][0] = 'a | '
+    row[0][0] = '| '
+    row[1][0] = '| '
+    row[2][0] = '| '
+    row[3][0] = '| '
+    row[4][0] = '| '
+    row[5][0] = '| '
     print('')
     print('  ' + '-'*(len(bottom_line)-3))
     for j in range(0,len(rows)):
@@ -104,7 +104,7 @@ def main():
         printfield(field)
         end_game_fl = check_end('Player_2',field)
 
-    print('End of game!')
+    print('End of the game!')
 
 
 if __name__ == '__main__':
