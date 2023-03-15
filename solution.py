@@ -3,9 +3,8 @@
 def printfield(field):
     '''Prints game's field'''
 
-    rows = ['a','b','c','d','e','f']
     bottom_line = '  1   2   3   4   5   6   7   '
-    row = [[n] for n in range(0,7)]
+    row = [[n] for n in range(7)]
     row[0][0] = '| '
     row[1][0] = '| '
     row[2][0] = '| '
@@ -13,12 +12,12 @@ def printfield(field):
     row[4][0] = '| '
     row[5][0] = '| '
     print('')
-    print('  ' + '-'*(len(bottom_line)-3))
-    for j in range(0,len(rows)):
+    print(' ' + '-'*(len(bottom_line)-3))
+    for j in range(6):
         for i in range(1,8):
             row[j][0] = row[j][0] + str(field[j][i-1]) + ' | '
         print(row[j][0])
-        print('  ' + '-'*((len(row[j][0])-3)))
+        print(' ' + '-'*((len(row[j][0])-3)))
     print(bottom_line)
     print('')
 
