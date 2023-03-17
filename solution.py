@@ -12,12 +12,12 @@ def printfield(field):
     row[4][0] = '| '
     row[5][0] = '| '
     print('')
-    print(' ' + '-'*(len(bottom_line)-3))
+    print(' ' + '-' * (len(bottom_line) - 3))
     for j in range(6):
         for i in range(1,8):
             row[j][0] = row[j][0] + str(field[j][i-1]) + ' | '
         print(row[j][0])
-        print(' ' + '-'*((len(row[j][0])-3)))
+        print(' ' + '-' * ((len(row[j][0]) - 3)))
     print(bottom_line)
     print('')
 
@@ -53,22 +53,22 @@ def check_end(player ,field):
     # Horiz check
     for j in range(0,6):
         for i in range(3,7):
-            if field[j][i]==field[j][i-1]==field[j][i-2]==field[j][i-3]==symb:
+            if field[j][i] == field[j][i-1] == field[j][i-2] == field[j][i-3] == symb:
                 game_fl = True
                 break
 
     # Vert chek
     for i in range(0,7):
         for j in range(3,6):
-            if field[j][i]==field[j-1][i]==field[j-2][i]==field[j-3][i]==symb:
+            if field[j][i] == field[j-1][i] == field[j-2][i] == field[j-3][i] == symb:
                 game_fl = True
                 break
 
     # Diag check
     for i in range(0,4):
         for j in range(0,3):
-            if (field[j][i]==field[j+1][i+1]==field[j+2][i+2]==field[j+3][i+3]==symb) or \
-                (field[j+3][i]==field[j+2][i+1]==field[j+1][i+2]==field[j][i+3]==symb):
+            if (field[j][i] == field[j+1][i+1] == field[j+2][i+2] == field[j+3][i+3] == symb) or \
+                (field[j+3][i] == field[j+2][i+1] == field[j+1][i+2] == field[j][i+3] == symb):
                 game_fl = True
                 break
 
@@ -90,21 +90,26 @@ def main():
     print('Please enter digits [1..7]')
 
     end_game_fl = False
+    max_steps = 6 * 7
+    cur_step = 0
     while not end_game_fl:
         # Player 1
         field, columns = step('Player_1', field, columns)
         printfield(field)
-        end_game_fl = check_end('Player_1',field)
+        cur_step += 1
+        end_game_fl = check_end('Player_1',field) or (cur_step == max_steps)
         if end_game_fl:
             break
 
         # Player_2
         field, columns = step('Player_2',field, columns)
+        cur_step += 1
         printfield(field)
-        end_game_fl = check_end('Player_2',field)
+        end_game_fl = check_end('Player_2',field) or (cur_step == max_steps)
 
+    if cur_step == max_steps:
+        print("It's a draw! Nobody wins.")
     print('End of the game!')
-
 
 if __name__ == '__main__':
     main()
