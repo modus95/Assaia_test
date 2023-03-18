@@ -1,115 +1,150 @@
 '''Connect 4 game'''
+import argparse
 
-def printfield(field):
-    '''Prints game's field'''
+class Field():
+    "Game's field"
+    def __init__(self, q_rows: int, q_cols: int) -> None:
+        self.q_rows = q_rows
+        self.q_cols = q_cols
 
-    bottom_line = '  1   2   3   4   5   6   7   '
-    row = [[n] for n in range(7)]
-    row[0][0] = '| '
-    row[1][0] = '| '
-    row[2][0] = '| '
-    row[3][0] = '| '
-    row[4][0] = '| '
-    row[5][0] = '| '
-    print('')
-    print(' ' + '-' * (len(bottom_line) - 3))
-    for j in range(6):
-        for i in range(1,8):
-            row[j][0] = row[j][0] + str(field[j][i-1]) + ' | '
-        print(row[j][0])
-        print(' ' + '-' * ((len(row[j][0]) - 3)))
-    print(bottom_line)
-    print('')
+        self.map = []
+        for _ in range(self.q_rows):
+            self.map.append([' '] * self.q_cols)
+
+        self.columns = {c:[] for c in range(self.q_cols)}
 
 
-def step(player, field, columns):
-    '''A player's step'''
+    def printfield(self) -> None:
+        '''Prints game's field'''
+        bottom_line = ''
+        for c in range(1, self.q_cols + 1):
+            bottom_line += f'{c}   '
+        bottom_line = '  ' + bottom_line
 
-    input_set = [str(i) for i in range(1,8)]
-    symb = 'X' if player == 'Player_1' else 'O'
+        print('')
+        print(' ' + '-' * (len(bottom_line) - 3))
+        for row in range(self.q_rows):
+            print('| ' + ' | '.join(self.map[row]) + ' |')
+            print(' ' + '-' * (len(bottom_line) - 3))
+        print(bottom_line)
+        print()
 
-    pos_col = str(input(player + ': '))
-    if not pos_col in input_set:
-        print('Please enter digits [1..7]')
-        step(player, field, columns)
-    else:
-        pos_col = int(pos_col)
-        if len(columns[pos_col-1]) < 6:
-            columns[pos_col-1].append(symb)
-            pos_col_ln = len(columns[pos_col-1])
-            field[6 - pos_col_ln][pos_col-1] = columns[pos_col-1][-1]
+    
+    def check_end(self, ind_row:int, ind_col:int) -> bool:
+        '''Check end of the game (win)'''
+        
+        symb = self.map[ind_row][ind_col]
+        symb_4 = symb * 4
+
+        # Horiz check
+        game_fl = symb_4 in ''.join(self.map[ind_row])
+        if game_fl:
+            return game_fl
+
+        # Vert chek
+        game_fl = symb_4 in ''.join(self.columns[ind_col])
+        if game_fl:
+            return game_fl
+
+        #Diag check
+        diag_upleft = []
+        for i in range(1, 4):
+            cur_col = ind_col - i
+            cur_row = ind_row - i
+            if (cur_col < 0) or (cur_row < 0):
+                break
+            diag_upleft.append(self.map[cur_row][cur_col])
+
+        diag_downleft = []
+        for i in range(1, 4):
+            cur_col = ind_col - i
+            cur_row = ind_row + i
+            if (cur_col < 0) or (cur_row > self.q_rows - 1):
+                break
+            diag_downleft.append(self.map[cur_row][cur_col])
+
+        diag_upright = []
+        for i in range(1, 4):
+            cur_col = ind_col + i
+            cur_row = ind_row - i
+            if (cur_col > self.q_cols - 1) or (cur_row < 0):
+                break
+            diag_upright.append(self.map[cur_row][cur_col])
+
+        diag_downright = []
+        for i in range(1, 4):
+            cur_col = ind_col + i
+            cur_row = ind_row + i
+            if (cur_col > self.q_cols - 1) or (cur_row > self.q_rows - 1):
+                break
+            diag_downright.append(self.map[cur_row][cur_col])
+
+        diag1 = diag_upleft[::-1] + [symb] + diag_downright
+        diag2 = diag_downleft[::-1] + [symb] + diag_upright
+
+        game_fl = (symb_4 in ''.join(diag1)) or (symb_4 in ''.join(diag2))
+        return game_fl
+
+
+    def step(self, id_player:int) -> bool:
+        '''A player's step'''
+
+        #input_set = [str(i) for i in range(1, self.q_cols + 1)]
+        symb = 'X' if id_player == 0 else 'O'
+
+        pos_col = int(input(f'Player_{id_player + 1}: '))
+        if 1 <= pos_col <= self.q_cols:
+            ind_col = pos_col - 1
+            if len(self.columns[ind_col]) < self.q_rows:
+                self.columns[ind_col].append(symb)
+                pos_col_ln = len(self.columns[ind_col])
+                ind_row = self.q_rows - pos_col_ln
+                self.map[ind_row][ind_col] = symb
+            else:
+                print('This column is full, try another column..')
+                self.step(id_player)
         else:
-            print('This column is full, try another column..')
-            step(player, field, columns)
+            print(f'Please enter digits [1..{self.q_cols}]')
+            self.step(id_player)
 
-    return field, columns
-
-
-def check_end(player ,field):
-    '''Check end of the game (win)'''
-    game_fl = False
-    symb = 'X' if player == 'Player_1' else 'O'
-
-    # Horiz check
-    for j in range(0,6):
-        for i in range(3,7):
-            if field[j][i] == field[j][i-1] == field[j][i-2] == field[j][i-3] == symb:
-                game_fl = True
-                break
-
-    # Vert chek
-    for i in range(0,7):
-        for j in range(3,6):
-            if field[j][i] == field[j-1][i] == field[j-2][i] == field[j-3][i] == symb:
-                game_fl = True
-                break
-
-    # Diag check
-    for i in range(0,4):
-        for j in range(0,3):
-            if (field[j][i] == field[j+1][i+1] == field[j+2][i+2] == field[j+3][i+3] == symb) or \
-                (field[j+3][i] == field[j+2][i+1] == field[j+1][i+2] == field[j][i+3] == symb):
-                game_fl = True
-                break
-
-    if game_fl:
-        print(player + ' wins')
-    return game_fl
+        game_fl = self.check_end(ind_row, ind_col)
+        
+        return game_fl
 
 
-def main():
+def run(q_rows, q_cols):
     '''Main program'''
 
-    field = []
-    for _ in range(6):
-        field.append([' '] * 7)
+    field = Field(q_rows, q_cols)
 
-    columns = {c:[] for c in range(7)}
-
-    printfield(field)
-    print('Please enter digits [1..7]')
+    field.printfield()
+    print(f'Please enter numbers [1..{q_cols}]')
 
     end_game_fl = False
-    max_steps = 6 * 7
+    max_steps = q_rows * q_cols
     cur_step = 0
+
     while not end_game_fl:
-        # Player 1
-        field, columns = step('Player_1', field, columns)
-        printfield(field)
+        id_gamer = cur_step % 2
+        end_game_fl = field.step(id_gamer)
+        field.printfield()
         cur_step += 1
-        end_game_fl = check_end('Player_1',field) or (cur_step == max_steps)
+
         if end_game_fl:
-            break
+            print(f'Player_{id_gamer + 1} has won!')
+        elif cur_step == max_steps:
+            print("It's a draw! Nobody wins.")
+            end_game_fl = True
 
-        # Player_2
-        field, columns = step('Player_2',field, columns)
-        cur_step += 1
-        printfield(field)
-        end_game_fl = check_end('Player_2',field) or (cur_step == max_steps)
-
-    if cur_step == max_steps:
-        print("It's a draw! Nobody wins.")
     print('End of the game!')
 
 if __name__ == '__main__':
-    main()
+    DESC = 'Connect4 game'
+
+    parser = argparse.ArgumentParser(description=DESC)
+    parser.add_argument('-r', '--q_rows', type=int, default=6, help="int (default: %(default)s)")
+    parser.add_argument('-c', '--q_cols', type=int, default=7, help="int (default: %(default)s)")
+    args = parser.parse_args()
+
+    run(args.q_rows, args.q_cols)
+    
