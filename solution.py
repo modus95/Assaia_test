@@ -29,10 +29,10 @@ class Field():
         print(bottom_line)
         print()
 
-    
+
     def check_end(self, ind_row:int, ind_col:int) -> bool:
         '''Check end of the game (win)'''
-        
+
         symb = self.map[ind_row][ind_col]
         symb_4 = symb * 4
 
@@ -47,42 +47,35 @@ class Field():
             return game_fl
 
         #Diag check
-        diag_upleft = []
-        for i in range(1, 4):
-            cur_col = ind_col - i
-            cur_row = ind_row - i
-            if (cur_col < 0) or (cur_row < 0):
-                break
-            diag_upleft.append(self.map[cur_row][cur_col])
+        # diagonal along increasing rows
+        min_delta_ind = 3
+        if min(ind_col, ind_row) < 3:
+            min_delta_ind = min(ind_col, ind_row)
 
-        diag_downleft = []
-        for i in range(1, 4):
-            cur_col = ind_col - i
-            cur_row = ind_row + i
-            if (cur_col < 0) or (cur_row > self.q_rows - 1):
-                break
-            diag_downleft.append(self.map[cur_row][cur_col])
+        max_delta_ind = 3
+        if min(self.q_cols - ind_col - 1, self.q_rows - ind_row - 1) < 3:
+            max_delta_ind = min(self.q_cols - ind_col - 1, self.q_rows - ind_row - 1)
 
-        diag_upright = []
-        for i in range(1, 4):
-            cur_col = ind_col + i
-            cur_row = ind_row - i
-            if (cur_col > self.q_cols - 1) or (cur_row < 0):
-                break
-            diag_upright.append(self.map[cur_row][cur_col])
+        diag_rows_inc = []
+        for delta in range(-min_delta_ind, max_delta_ind + 1):
+            diag_rows_inc.append(self.map[ind_row + delta][ind_col + delta])
 
-        diag_downright = []
-        for i in range(1, 4):
-            cur_col = ind_col + i
-            cur_row = ind_row + i
-            if (cur_col > self.q_cols - 1) or (cur_row > self.q_rows - 1):
-                break
-            diag_downright.append(self.map[cur_row][cur_col])
+        # diagonal along deccreasing rows
 
-        diag1 = diag_upleft[::-1] + [symb] + diag_downright
-        diag2 = diag_downleft[::-1] + [symb] + diag_upright
+        min_delta_ind = 3
+        if min(self.q_rows - ind_row - 1, ind_col) < 3:
+            min_delta_ind = min(self.q_rows - ind_row - 1, ind_col)
 
-        game_fl = (symb_4 in ''.join(diag1)) or (symb_4 in ''.join(diag2))
+        max_delta_ind = 3
+        if min(ind_row, self.q_cols - ind_col - 1) < 3:
+            max_delta_ind = min(ind_row, self.q_cols - ind_col - 1)
+
+        diag_rows_desc = []
+        for delta in range(-min_delta_ind, max_delta_ind + 1):
+            diag_rows_desc.append(self.map[ind_row - delta][ind_col + delta])
+
+        game_fl = (symb_4 in ''.join(diag_rows_inc)) or (symb_4 in ''.join(diag_rows_desc))
+
         return game_fl
 
 
@@ -108,7 +101,7 @@ class Field():
             self.step(id_player)
 
         game_fl = self.check_end(ind_row, ind_col)
-        
+
         return game_fl
 
 
