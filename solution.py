@@ -85,20 +85,21 @@ class Field():
         #input_set = [str(i) for i in range(1, self.q_cols + 1)]
         symb = 'X' if id_player == 0 else 'O'
 
-        pos_col = int(input(f'Player_{id_player + 1}: '))
-        if 1 <= pos_col <= self.q_cols:
-            ind_col = pos_col - 1
-            if len(self.columns[ind_col]) < self.q_rows:
-                self.columns[ind_col].append(symb)
-                pos_col_ln = len(self.columns[ind_col])
-                ind_row = self.q_rows - pos_col_ln
-                self.map[ind_row][ind_col] = symb
+        wrong_inp_fl = True
+        while wrong_inp_fl:
+            pos_col = int(input(f'Player_{id_player + 1}: '))
+            if 1 <= pos_col <= self.q_cols:
+                ind_col = pos_col - 1
+                if len(self.columns[ind_col]) < self.q_rows:
+                    self.columns[ind_col].append(symb)
+                    pos_col_ln = len(self.columns[ind_col])
+                    ind_row = self.q_rows - pos_col_ln
+                    self.map[ind_row][ind_col] = symb
+                    wrong_inp_fl = False
+                else:
+                    print('This column is full, try another column..')
             else:
-                print('This column is full, try another column..')
-                self.step(id_player)
-        else:
-            print(f'Please enter digits [1..{self.q_cols}]')
-            self.step(id_player)
+                print(f'Please enter digits [1..{self.q_cols}]')
 
         game_fl = self.check_end(ind_row, ind_col)
 
